@@ -7,26 +7,41 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    username = Column(String(250), nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+class Follower(Base):
+    __tablename__ = 'followers'
+    user_from_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    user_to_id = Column(Integer, ForeignKey('users.id'))
+
+class Post(Base):
+    __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    text = Column(String(250))
+    likes = Column(Integer)
 
-    def to_dict(self):
-        return {}
+class File(Base):
+    __tablename__ = 'files'
+    id = Column(Integer, primary_key=True)
+    filetype = Column(String(250), nullable=False)
+    url = Column(String(250), nullable=False)
+    post_id = Column(Integer, ForeignKey('posts.id'))
+
+class Liked(Base):
+    __tablename__ = 'liked_posts'
+    user_id = Column(Integer, ForeignKey('users.id'))
+    post_id = Column(Integer, ForeignKey('posts.id'), primary_key=True)
+
+class Comment(Base):
+    __tablename__ = 'comments'
+    user_id = Column(Integer, ForeignKey('users.id'))
+    post_id = Column(Integer, ForeignKey('posts.id'), primary_key=True)
+    text = Column(String(250))
 
 ## Draw from SQLAlchemy base
 try:
